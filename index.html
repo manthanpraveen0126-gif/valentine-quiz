@@ -1,27 +1,213 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Valentine Quiz</title>
-    <link rel="stylesheet" href="style.css">
+<title>Valentine Millionaire</title>
+<style>
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle at center, #1a002a, #000);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #ff4da6;
+}
+
+.question-box {
+    background: rgba(255,255,255,0.08);
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.options button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: linear-gradient(45deg, #ff0080, #8000ff);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.options button:hover {
+    transform: scale(1.05);
+}
+
+.locked {
+    background: #444 !important;
+}
+
+.hidden {
+    display: none;
+}
+
+.final-inputs input {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    text-align: center;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+}
+
+.flip {
+    font-size: 60px;
+    margin-top: 20px;
+    transition: transform 0.8s;
+}
+
+.reveal {
+    font-size: 40px;
+    color: #ff4da6;
+    margin-top: 20px;
+}
+
+</style>
 </head>
 <body>
 
-    <div class="quiz-container">
-        <h1>Valentine Quiz</h1>
+<div class="container">
+    <h1>Valentine Millionaire</h1>
+    <div id="game"></div>
+</div>
 
-        <div id="questionBox">
-            <div id="question"></div>
-            <div id="options"></div>
+<script>
+
+const questions = [
+{
+q: "When did I see you first?",
+options: ["March","July","June","May"],
+answer: 2
+},
+{
+q: "What was the first text I sent to you?",
+options: ["Yoo","Hey how you doing","Heyyyyy","Hi what’s up"],
+answer: 1
+},
+{
+q: "What was the first compliment I gave to you?",
+options: ["You look pretty","I love your confidence","Your PFP is lit","You smell good"],
+answer: 2
+},
+{
+q: "When did we first go on a date?",
+options: ["December 19th","December 26th","November 17th","December 20th"],
+answer: 3
+},
+{
+q: "What's one thing I tell very often?",
+options: ["I miss you","I love you","You're cute","All of the above"],
+answer: 3
+}
+];
+
+let current = 0;
+
+function loadQuestion() {
+    const game = document.getElementById("game");
+
+    if(current < questions.length){
+        const q = questions[current];
+        game.innerHTML = `
+            <div class="question-box">
+                <h3>Question ${current+1} / ${questions.length}</h3>
+                <p>${q.q}</p>
+            </div>
+            <div class="options">
+                ${q.options.map((opt,i)=> 
+                    `<button onclick="selectAnswer(${i})">${String.fromCharCode(65+i)}) ${opt}</button>`
+                ).join("")}
+            </div>
+        `;
+    } else {
+        loadFinal();
+    }
+}
+
+function selectAnswer(i){
+    const correct = questions[current].answer;
+    const buttons = document.querySelectorAll(".options button");
+
+    buttons.forEach(btn=>btn.classList.add("locked"));
+
+    if(i === correct){
+        setTimeout(()=>{
+            current++;
+            loadQuestion();
+        },1000);
+    } else {
+        alert("Wrong answer. Try again ❤️");
+        loadQuestion();
+    }
+}
+
+function loadFinal(){
+    const game = document.getElementById("game");
+    game.innerHTML = `
+        <div class="question-box">
+            <h3>Final Question</h3>
+            <p>Answer these 3 simple things correctly...</p>
+            <p>1) First letter of Yes?</p>
+            <p>2) Replace 'E' with what number?</p>
+            <p>3) Last letter of Yes?</p>
         </div>
-
-        <div id="result" class="hidden">
-            <h2>Score</h2>
-            <div id="score"></div>
-            <button onclick="restartQuiz()">Restart</button>
+        <div class="final-inputs">
+            <input maxlength="1" id="i1">
+            <input maxlength="1" id="i2">
+            <input maxlength="1" id="i3">
         </div>
-    </div>
+        <button onclick="checkFinal()">Lock Answer</button>
+        <div id="flipArea"></div>
+    `;
+}
 
-    <script src="script.js"></script>
+function checkFinal(){
+    const a = document.getElementById("i1").value.toUpperCase();
+    const b = document.getElementById("i2").value;
+    const c = document.getElementById("i3").value.toUpperCase();
 
+    if(a==="Y" && b==="3" && c==="S"){
+        const flipArea = document.getElementById("flipArea");
+        flipArea.innerHTML = `<div class="flip" id="flipText">Y3S</div>`;
+
+        setTimeout(()=>{
+            document.getElementById("flipText").style.transform = "rotateY(180deg)";
+        },500);
+
+        setTimeout(()=>{
+            flipArea.innerHTML = `
+                <div class="reveal">YES ❤️</div>
+                <div class="reveal">Will you be my forever Valentine?</div>
+            `;
+        },1300);
+
+    } else {
+        alert("Not quite... think carefully 😉");
+    }
+}
+
+loadQuestion();
+
+</script>
 </body>
 </html>
